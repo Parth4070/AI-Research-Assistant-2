@@ -15,13 +15,12 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-TEMPLATES[0]['DIRS'] = [BASE_DIR / "temmplates"]
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR.parent / "static"]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR.parent / "media"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -85,6 +84,8 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATES[0]['DIRS'] = [BASE_DIR.parent / "templates"]
+
 WSGI_APPLICATION = 'research_ai.wsgi.application'
 
 
@@ -134,3 +135,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 
+AUTH_USER_MODEL = "accounts.User"
