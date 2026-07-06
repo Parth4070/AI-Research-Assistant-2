@@ -18,7 +18,9 @@
 
     <li>
 
-        <strong>{{ project.title }}</strong>
+        <a href="{% url 'project_detail' project.id %}">
+            <strong>{{ project.title }}</strong>
+        </a>
 
         <br>
 

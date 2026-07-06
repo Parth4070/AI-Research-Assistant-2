@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ project.title }}</h1>
+
+<p>{{ project.description }}</p>
+
+<hr>
+
+<h2>Project Workspace</h2>
+
+<ul>
+
+    <li>
+        <a href="{% url 'upload_dataset' project.id %}">
+            Upload Dataset
+        </a>
+    </li>
+
+    <li>
+        Dataset Explorer
+    </li>
+
+    <li>
+        Data Cleaning
+    </li>
+
+    <li>
+        Statistical Analysis
+    </li>
+
+    <li>
+        Machine Learning
+    </li>
+
+    <li>
+        Reports
+    </li>
+
+</ul>
+
+{% endblock %}
