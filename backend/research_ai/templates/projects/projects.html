@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>My Projects</h2>
+
+<p>
+    <a href="{% url 'create_project' %}">
+        + New Project
+    </a>
+</p>
+
+{% if projects %}
+
+<ul>
+
+{% for project in projects %}
+
+    <li>
+
+        <strong>{{ project.title }}</strong>
+
+        <br>
+
+        {{ project.description }}
+
+    </li>
+
+{% endfor %}
+
+</ul>
+
+{% else %}
+
+<p>No projects yet.</p>
+
+{% endif %}
+
+{% endblock %}
