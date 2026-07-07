@@ -26,4 +26,9 @@ def create_project(request):
 @login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Projects, id=project_id, owner=request.user)
-    return render(request, "projects/project_detail.html", {"project": project})
+    datasets = project.datasets.all()
+    context = {
+        "project": project,
+        "dataset": datasets
+    }
+    return render(request, "projects/project_detail.html", context)

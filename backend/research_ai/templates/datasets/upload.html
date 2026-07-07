@@ -23,4 +23,62 @@
 
 </form>
 
+<h2>Datasets</h2>
+
+{% if datasets %}
+
+<table border="1" cellpadding="8">
+
+<tr>
+
+<th>Name</th>
+
+<th>Type</th>
+
+<th>Processing</th>
+
+<th>View</th>
+
+</tr>
+
+{% for dataset in datasets %}
+
+<tr>
+
+<td>{{ dataset.name }}</td>
+
+<td>
+
+{% if dataset.is_original %}
+Original
+{% else %}
+Derived
+{% endif %}
+
+</td>
+
+<td>{{ dataset.processing_step }}</td>
+
+<td>
+
+<a href="{% url 'dataset_detail' dataset.id %}">
+
+Open
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No datasets uploaded.</p>
+
+{% endif %}
+
 {% endblock %}

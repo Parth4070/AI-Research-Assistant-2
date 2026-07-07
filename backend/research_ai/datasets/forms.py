@@ -4,4 +4,4 @@ from .models import *
 class DatasetUploadForm(forms.ModelForm):
     class Meta:
         model = Dataset
-        fields = ["file"]
+        fields = ["name" ,"file"]

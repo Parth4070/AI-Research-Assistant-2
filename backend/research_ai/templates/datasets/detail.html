@@ -6,20 +6,94 @@
 
 <hr>
 
-<p><strong>Rows:</strong> {{ rows }}</p>
+<h2>Dataset Overview</h2>
 
-<p><strong>Columns:</strong> {{ columns }}</p>
+<table border="1" cellpadding="8">
 
-<h3>Column Names</h3>
+<tr>
+    <th>Rows</th>
+    <td>{{ rows }}</td>
+</tr>
+
+<tr>
+    <th>Columns</th>
+    <td>{{ columns }}</td>
+</tr>
+
+<tr>
+    <th>Duplicate Rows</th>
+    <td>{{ duplicate_rows }}</td>
+</tr>
+
+</table>
+
+<br>
+
+<h2>Column Names</h2>
 
 <ul>
 
 {% for column in column_names %}
 
-    <li>{{ column }}</li>
+<li>{{ column }}</li>
 
 {% endfor %}
 
 </ul>
+
+<h2>Missing Values</h2>
+
+<table border="1" cellpadding="5">
+
+<tr>
+
+    <th>Column</th>
+
+    <th>Missing</th>
+
+</tr>
+
+{% for column, missing in missing_values.items %}
+
+<tr>
+
+    <td>{{ column }}</td>
+
+    <td>{{ missing }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<h2>Data Types</h2>
+
+<table border="1" cellpadding="5">
+
+<tr>
+
+    <th>Column</th>
+
+    <th>Type</th>
+
+</tr>
+
+{% for column, dtype in data_types.items %}
+
+<tr>
+
+    <td>{{ column }}</td>
+
+    <td>{{ dtype }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+<h2>Preview</h2>
+
+{{ head|safe }}
 
 {% endblock %}
