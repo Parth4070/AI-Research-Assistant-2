@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ dataset }}</h1>
+
+<hr>
+
+<p><strong>Rows:</strong> {{ rows }}</p>
+
+<p><strong>Columns:</strong> {{ columns }}</p>
+
+<h3>Column Names</h3>
+
+<ul>
+
+{% for column in column_names %}
+
+    <li>{{ column }}</li>
+
+{% endfor %}
+
+</ul>
+
+{% endblock %}
