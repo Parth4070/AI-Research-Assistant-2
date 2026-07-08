@@ -5,6 +5,9 @@
 <h1>{{ dataset }}</h1>
 
 <hr>
+<a href="{% url 'clean_dataset' dataset.id %}">
+    🧹 Clean Dataset
+</a>
 
 <h2>Dataset Overview</h2>
 

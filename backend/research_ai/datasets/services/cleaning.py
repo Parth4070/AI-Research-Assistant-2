@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas.api.types import is_numeric_dtype, is_bool_dtype
 
 def remove_duplicates(df):
     """
@@ -22,14 +23,14 @@ def impute_values(df):
     filled = {}
     for column in df.columns:
 
-        if df[column].dtype == "object":
+        if is_numeric_dtype(df[column]) and not is_bool_dtype(df[column]):
 
-            modes = df[column].mode()
-            value = modes[0] if not modes.empty else ""
+            value = df[column].mean()
 
         else:
 
-            value = df[column].mean()
+            modes = df[column].mode()
+            value = modes[0] if not modes.empty else ""
 
         missing = df[column].isnull().sum()
 
