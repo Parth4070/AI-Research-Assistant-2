@@ -1,5 +1,6 @@
 from .services.pipeline import generate_clean_filename
 from .services.pipeline import DataCleaningPipeline
+from .services.dataset_service import DatasetService
 from django.shortcuts import render
 from io import StringIO
 from django.core.files.base import ContentFile
@@ -98,18 +99,7 @@ def clean_dataset_view(request, dataset_id):
     pipeline = DataCleaningPipeline()
 
     clean_df, report = pipeline.run(df)
-    buffer = StringIO()
-    clean_df.to_csv(buffer, index=False)
-    content = ContentFile(buffer.getvalue())
-    filename = generate_clean_filename(dataset)
-
-    new_dataset = Dataset.objects.create(
-        project=  dataset.project,
-        name=f"{dataset.name} (Cleaned)",
-        is_original=False,
-        parent_dataset=dataset,
-        processing_step = "Cleaning"
-    )
-    new_dataset.file.save(filename, content)
+    
+    new_dataset = DatasetService.create_clean_version(dataset, clean_df)
     
     return redirect("dataset_detail", new_dataset.id)
