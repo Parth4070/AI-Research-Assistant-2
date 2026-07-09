@@ -2,101 +2,149 @@
 
 {% block content %}
 
-<h1>{{ dataset }}</h1>
+<!-- Header and Primary Actions -->
+<div class="glass-card" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+        <span class="badge badge-original" style="margin-bottom: 0.5rem;">Dataset Explorer</span>
+        <h1>{{ dataset.name }}</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">File path: {{ dataset.file.name }}</p>
+    </div>
+    
+    <div style="display: flex; gap: 1rem;">
+        {% if dataset.is_original %}
+            <a href="{% url 'clean_dataset' dataset.id %}" class="btn btn-secondary" style="background: var(--secondary-gradient);">
+                🧹 Clean Dataset
+            </a>
+        {% endif %}
+        <a href="{% url 'train_model' dataset.id %}" class="btn">
+            🤖 Train ML Model
+        </a>
+    </div>
+</div>
 
-<hr>
-<a href="{% url 'clean_dataset' dataset.id %}">
-    🧹 Clean Dataset
-</a>
+<div class="grid-2">
+    <!-- Dataset Overview -->
+    <div class="glass-card">
+        <h3>Dataset Overview</h3>
+        <table class="table" style="margin-top: 1rem;">
+            <tr>
+                <th style="width: 50%;">Metric</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Total Rows</td>
+                <td style="font-weight: 600; color: #ffffff;">{{ rows }}</td>
+            </tr>
+            <tr>
+                <td>Total Columns</td>
+                <td style="font-weight: 600; color: #ffffff;">{{ columns }}</td>
+            </tr>
+            <tr>
+                <td>Duplicate Rows</td>
+                <td style="font-weight: 600; color: {% if duplicate_rows > 0 %}var(--text-danger){% else %}var(--text-success){% endif %};">
+                    {{ duplicate_rows }}
+                </td>
+            </tr>
+            <tr>
+                <td>Memory Usage</td>
+                <td style="font-weight: 600; color: var(--secondary);">{{ memory_usage }} KB</td>
+            </tr>
+        </table>
+    </div>
 
-<h2>Dataset Overview</h2>
+    <!-- Data Types and Missing Values -->
+    <div class="glass-card">
+        <h3>Feature Information</h3>
+        <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-glass); border-radius: 8px;">
+            <table class="table" style="margin: 0;">
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Missing Values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for column, dtype in data_types.items %}
+                        <tr>
+                            <td style="color: #ffffff; font-weight: 500;">{{ column }}</td>
+                            <td><code style="color: var(--secondary);">{{ dtype }}</code></td>
+                            <td>
+                                {% for col_name, missing_count in missing_values.items %}
+                                    {% if col_name == column %}
+                                        <span style="font-weight: 600; color: {% if missing_count > 0 %}var(--text-warning){% else %}var(--text-muted){% endif %};">
+                                            {{ missing_count }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-<table border="1" cellpadding="8">
+<!-- Dataset Preview -->
+<div class="glass-card" style="overflow-x: auto;">
+    <h3>Dataset Preview (First 5 Rows)</h3>
+    <div style="overflow-x: auto; margin-top: 1rem;">
+        {{ head|safe }}
+    </div>
+</div>
 
-<tr>
-    <th>Rows</th>
-    <td>{{ rows }}</td>
-</tr>
+<!-- Columns Profiling Details -->
+<div class="glass-card">
+    <h3>Detailed Column Analysis</h3>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Detailed summary for individual attributes in your dataset.</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for column in profile_columns %}
+            <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-glass); border-radius: 12px; padding: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 0.5rem;">
+                    <h4 style="margin: 0; color: var(--secondary);">{{ column.name }}</h4>
+                    <span class="badge badge-original" style="font-size: 0.7rem;">{{ column.dtype }}</span>
+                </div>
+                
+                <div class="grid-3" style="margin-bottom: 0; gap: 1rem;">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">Missing Values</span>
+                        <div style="font-weight: 600; color: {% if column.missing > 0 %}var(--text-warning){% else %}var(--text-success){% endif %};">
+                            {{ column.missing }}
+                        </div>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">Unique Values</span>
+                        <div style="font-weight: 600; color: #ffffff;">{{ column.unique }}</div>
+                    </div>
+                    <div>
+                        {% if column.mean %}
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Mean / Median</span>
+                            <div style="font-weight: 600; color: #ffffff;">
+                                {{ column.mean|floatformat:3 }} / {{ column.median|floatformat:3 }}
+                            </div>
+                        {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Most Common</span>
+                            <div style="font-weight: 600; color: #ffffff;">{{ column.most_common }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 
-<tr>
-    <th>Columns</th>
-    <td>{{ columns }}</td>
-</tr>
+<!-- Summary Statistics -->
+<div class="glass-card" style="overflow-x: auto;">
+    <h3>Dataset Summary Statistics</h3>
+    <div style="overflow-x: auto; margin-top: 1rem;">
+        {{ describe|safe }}
+    </div>
+</div>
 
-<tr>
-    <th>Duplicate Rows</th>
-    <td>{{ duplicate_rows }}</td>
-</tr>
-
-</table>
-
-<br>
-
-<h2>Column Names</h2>
-
-<ul>
-
-{% for column in column_names %}
-
-<li>{{ column }}</li>
-
-{% endfor %}
-
-</ul>
-
-<h2>Missing Values</h2>
-
-<table border="1" cellpadding="5">
-
-<tr>
-
-    <th>Column</th>
-
-    <th>Missing</th>
-
-</tr>
-
-{% for column, missing in missing_values.items %}
-
-<tr>
-
-    <td>{{ column }}</td>
-
-    <td>{{ missing }}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-<h2>Data Types</h2>
-
-<table border="1" cellpadding="5">
-
-<tr>
-
-    <th>Column</th>
-
-    <th>Type</th>
-
-</tr>
-
-{% for column, dtype in data_types.items %}
-
-<tr>
-
-    <td>{{ column }}</td>
-
-    <td>{{ dtype }}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-<h2>Preview</h2>
-
-{{ head|safe }}
+<div style="margin-top: 2rem;">
+    <a href="{% url 'project_detail' dataset.project.id %}" class="btn btn-outline">&larr; Back to Project Workspace</a>
+</div>
 
 {% endblock %}

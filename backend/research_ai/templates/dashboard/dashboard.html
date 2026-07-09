@@ -2,16 +2,81 @@
 
 {% block content %}
 
-<h1>Dashboard</h1>
+<div style="margin-bottom: 2rem;">
+    <h1>Dashboard</h1>
+    <p style="color: var(--text-muted);">Welcome back, {{ user.username }}. Here is an overview of your active research workspace.</p>
+</div>
 
-<p>Welcome, {{ user.username }}</p>
+<!-- Statistics Grid -->
+<div class="grid-3">
+    <div class="glass-card stat-card">
+        <div class="stat-label">Projects</div>
+        <div class="stat-value">{{ projects_count }}</div>
+        <a href="{% url 'projects_list' %}" style="font-size: 0.9rem;">View Projects &rarr;</a>
+    </div>
+    
+    <div class="glass-card stat-card">
+        <div class="stat-label">Datasets</div>
+        <div class="stat-value">{{ datasets_count }}</div>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">Uploaded or Cleaned</span>
+    </div>
+    
+    <div class="glass-card stat-card">
+        <div class="stat-label">ML Experiments</div>
+        <div class="stat-value">{{ experiments_count }}</div>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">Trained Models</span>
+    </div>
+</div>
 
-<hr>
+<div class="grid-2">
+    <!-- Recent Projects -->
+    <div class="glass-card">
+        <h3>Recent Projects</h3>
+        {% if recent_projects %}
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                {% for project in recent_projects %}
+                    <div class="list-item" style="margin-bottom: 0;">
+                        <div>
+                            <a href="{% url 'project_detail' project.id %}" style="font-weight: 600; color: #ffffff;">{{ project.title }}</a>
+                            <div class="list-item-meta">{{ project.created_at|date:"M d, Y" }}</div>
+                        </div>
+                        <a href="{% url 'project_detail' project.id %}" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">Open</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); margin: 1rem 0;">No projects created yet.</p>
+        {% endif %}
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'create_project' %}" class="btn" style="font-size: 0.85rem;">+ Create New Project</a>
+        </div>
+    </div>
+    
+    <!-- Recent Experiments -->
+    <div class="glass-card">
+        <h3>Recent ML Models</h3>
+        {% if recent_experiments %}
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                {% for exp in recent_experiments %}
+                    <div class="list-item" style="margin-bottom: 0;">
+                        <div>
+                            <span style="font-weight: 600; color: #ffffff;">{{ exp.best_model }}</span>
+                            <div class="list-item-meta">Dataset: {{ exp.dataset.name }} ({{ exp.problem_type }})</div>
+                        </div>
+                        <div style="text-align: right;">
+                            {% if exp.problem_type == "classification" %}
+                                <span class="badge badge-cleaned" style="font-size: 0.85rem;">Acc: {{ exp.accuracy|floatformat:3 }}</span>
+                            {% else %}
+                                <span class="badge badge-original" style="font-size: 0.85rem;">R²: {{ exp.accuracy|floatformat:3 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); margin: 1rem 0;">No models trained yet. Go to a dataset details page to train one!</p>
+        {% endif %}
+    </div>
+</div>
 
-<h3>Your Research Projects</h3>
-
-<p>No projects yet.</p>
-
-<a href="#">+ Create New Project</a>
-
-{% endblock %}
+{% endblock %}

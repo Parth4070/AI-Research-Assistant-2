@@ -22,5 +22,6 @@ urlpatterns = [
     path("", include("dashboard.urls")),
     path("accounts/", include("accounts.urls")),
     path("projects/", include("projects.urls")),
-    path("datasets/", include("datasets.urls"))
+    path("datasets/", include("datasets.urls")),
+    path("ml/", include("ml_engine.urls")),
 ]

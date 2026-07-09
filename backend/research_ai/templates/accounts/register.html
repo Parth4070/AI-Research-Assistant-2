@@ -2,20 +2,26 @@
 
 {% block content %}
 
-<h2>Register</h2>
+<div class="glass-card" style="max-width: 480px; margin: 3rem auto; padding: 2.5rem 2rem;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Create ResearchAI Account</h2>
 
-<form method="POST">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            {{ form.as_p }}
+        </div>
 
-    {% csrf_token %}
+        <div style="margin-top: 1.75rem;">
+            <button type="submit" class="btn" style="width: 100%; padding: 0.85rem;">
+                Register Account
+            </button>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+        Already have an account? <a href="{% url 'login' %}" style="font-weight: 600;">Sign in here</a>
+    </div>
+</div>
 
-    {{ form.as_p }}
-
-    <button type="submit">
-
-        Register
-
-    </button>
-
-</form>
-
-{% endblock %}
+{% endblock %}

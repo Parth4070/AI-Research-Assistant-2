@@ -2,42 +2,55 @@
 
 {% block content %}
 
-<h1>{{ project.title }}</h1>
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h1>{{ project.title }}</h1>
+    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 1.1rem;">{{ project.description }}</p>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">Created: {{ project.created_at|date:"F d, Y" }}</div>
+</div>
 
-<p>{{ project.description }}</p>
+<div class="grid-2">
+    <!-- Datasets Management Card -->
+    <div class="glass-card" style="grid-column: span 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 0;">Datasets Workspace</h3>
+            <a href="{% url 'upload_dataset' project.id %}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1.25rem;">+ Upload Dataset</a>
+        </div>
 
-<hr>
+        {% if dataset %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for ds in dataset %}
+                    <div class="list-item" style="flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <h4 style="margin-bottom: 0.25rem; font-size: 1.1rem; color: #ffffff;">{{ ds.name }}</h4>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                {% if ds.is_original %}
+                                    <span class="badge badge-original">Original</span>
+                                {% else %}
+                                    <span class="badge badge-cleaned">Cleaned</span>
+                                {% endif %}
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Step: {{ ds.processing_step }}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <a href="{% url 'dataset_detail' ds.id %}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">🔍 Explorer</a>
+                            
+                            {% if ds.is_original %}
+                                <a href="{% url 'clean_dataset' ds.id %}" class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.8rem; background: var(--secondary-gradient);">🧹 Clean Data</a>
+                            {% endif %}
+                            
+                            <a href="{% url 'train_model' ds.id %}" class="btn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">🤖 Train ML Model</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); margin: 2rem 0; text-align: center;">No datasets uploaded to this project yet. Start by uploading a dataset.</p>
+            <div style="text-align: center;">
+                <a href="{% url 'upload_dataset' project.id %}" class="btn">Upload Your First Dataset</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 
-<h2>Project Workspace</h2>
-
-<ul>
-
-    <li>
-        <a href="{% url 'upload_dataset' project.id %}">
-            Upload Dataset
-        </a>
-    </li>
-
-    <li>
-        Dataset Explorer
-    </li>
-
-    <li>
-        Data Cleaning
-    </li>
-
-    <li>
-        Statistical Analysis
-    </li>
-
-    <li>
-        Machine Learning
-    </li>
-
-    <li>
-        Reports
-    </li>
-
-</ul>
-
-{% endblock %}
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h1>Train Machine Learning Model</h1>
+    <p style="color: var(--text-muted);">Dataset: <strong style="color: #ffffff;">{{ dataset.name }}</strong></p>
+</div>
+
+{% if success %}
+    <!-- Success Results Display -->
+    <div class="alert alert-success">
+        🎉 Model training completed successfully!
+    </div>
+
+    <div class="grid-2">
+        <!-- Best Model Card -->
+        <div class="glass-card" style="border-color: var(--text-success); box-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span class="badge badge-cleaned" style="margin-bottom: 0.5rem;">Best Model</span>
+                    <h2>{{ best_model.name }}</h2>
+                </div>
+                {% if experiment.model_file %}
+                    <a href="{{ experiment.model_file.url }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">💾 Download Model (.pkl)</a>
+                {% endif %}
+            </div>
+            
+            <hr style="margin: 1rem 0;">
+            
+            <div class="grid-2" style="margin-bottom: 0; gap: 1rem;">
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Target Column</div>
+                    <div style="font-weight: 600;">{{ experiment.target_column }}</div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Task Type</div>
+                    <div style="font-weight: 600; text-transform: capitalize;">{{ experiment.problem_type }}</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 1rem; gap: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px;">
+                {% if experiment.problem_type == "classification" %}
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">Accuracy</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-success);">{{ best_model.accuracy|floatformat:4 }}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">Weighted F1-Score</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-success);">{{ best_model.f1|floatformat:4 }}</div>
+                    </div>
+                {% else %}
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">R² Score (R-squared)</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-success);">{{ best_model.accuracy|floatformat:4 }}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">RMSE</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--secondary);">{{ best_model.precision|floatformat:4 }}</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Card -->
+        <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 1.5rem;">
+            <h3>Ready to apply this model?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                The best performing model has been saved and serialized. You can now use it in your external pipelines or perform further predictions.
+            </p>
+            <div style="display: flex; gap: 1rem; width: 100%;">
+                <a href="{% url 'project_detail' dataset.project.id %}" class="btn" style="flex: 1;">Back to Project</a>
+                <a href="{% url 'dataset_detail' dataset.id %}" class="btn btn-outline" style="flex: 1;">Dataset Explorer</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparative Table of All Models -->
+    <div class="glass-card">
+        <h3>Model Comparison Performance</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Model Name</th>
+                    {% if experiment.problem_type == "classification" %}
+                        <th>Accuracy</th>
+                        <th>Precision (Weighted)</th>
+                        <th>Recall (Weighted)</th>
+                        <th>F1-Score (Weighted)</th>
+                    {% else %}
+                        <th>R² (R-squared)</th>
+                        <th>RMSE</th>
+                        <th>MAE</th>
+                        <th>MSE</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for model_res in results %}
+                    <tr style="{% if model_res.name == best_model.name %}background: rgba(16, 185, 129, 0.05); font-weight: 600;{% endif %}">
+                        <td style="color: #ffffff;">
+                            {{ model_res.name }}
+                            {% if model_res.name == best_model.name %}
+                                <span class="badge badge-cleaned" style="font-size: 0.65rem; margin-left: 0.5rem;">Best</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ model_res.accuracy|floatformat:4 }}</td>
+                        <td>{{ model_res.precision|floatformat:4 }}</td>
+                        {% if experiment.problem_type == "classification" %}
+                            <td>{{ model_res.recall|floatformat:4 }}</td>
+                            <td>{{ model_res.f1|floatformat:4 }}</td>
+                        {% else %}
+                            <td>{{ model_res.f1|floatformat:4 }}</td>
+                            <td>{{ model_res.recall|floatformat:4 }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% else %}
+    <!-- Training Options Form -->
+    <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+        <h3>Select Training Configuration</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
+            Choose which column you want to predict (target column). The problem type will be auto-selected but you can override it.
+        </p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.target_column.id_for_label }}">Predict Target Column</label>
+                {{ form.target_column }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.problem_type.id_for_label }}">Machine Learning Task Type</label>
+                {{ form.problem_type }}
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="btn" style="width: 100%; padding: 0.85rem;">
+                    🚀 Start Model Training
+                </button>
+            </div>
+        </form>
+    </div>
+{% endif %}
+
+{% endblock %}
